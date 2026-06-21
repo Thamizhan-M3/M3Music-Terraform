@@ -1,9 +1,17 @@
-output "frontend_alb_dns" {
-  value = aws_lb.frontend_alb.dns_name
-}
-
 output "cloudfront_domain" {
   value = aws_cloudfront_distribution.songs_cdn.domain_name
+}
+
+output "eks_cluster_name" {
+  value = aws_eks_cluster.main.name
+}
+
+output "eks_cluster_endpoint" {
+  value = aws_eks_cluster.main.endpoint
+}
+
+output "eks_node_group_name" {
+  value = aws_eks_node_group.main.node_group_name
 }
 
 output "database_private_ip" {
