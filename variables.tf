@@ -82,6 +82,11 @@ variable "frontend_image" {
   type = string
 }
 
+variable "frontend_url" {
+  type        = string
+  description = "Public URL allowed by the backend for frontend-origin requests."
+}
+
 variable "desired_capacity" {
   type = number
 }

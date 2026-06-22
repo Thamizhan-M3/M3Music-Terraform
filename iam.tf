@@ -32,6 +32,29 @@ data "aws_iam_policy_document" "lambda_assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "backend_irsa_assume_role" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.eks.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:dev-m3:m3music-m3-music"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.eks.url, "https://", "")}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_role" "frontend_role" {
   name               = "${var.project_name}-frontend-role"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
@@ -45,6 +68,11 @@ resource "aws_iam_role" "backend_role" {
 resource "aws_iam_role" "database_role" {
   name               = "${var.project_name}-database-role"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
+}
+
+resource "aws_iam_role" "backend_irsa_role" {
+  name               = "${var.project_name}-backend-irsa-role"
+  assume_role_policy = data.aws_iam_policy_document.backend_irsa_assume_role.json
 }
 
 resource "aws_iam_instance_profile" "frontend_profile" {
@@ -181,6 +209,11 @@ resource "aws_iam_role_policy_attachment" "backend_s3_attachment" {
   policy_arn = aws_iam_policy.s3_upload_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "backend_irsa_s3_attachment" {
+  role       = aws_iam_role.backend_irsa_role.name
+  policy_arn = aws_iam_policy.s3_upload_policy.arn
+}
+
 resource "aws_iam_role_policy_attachment" "backend_cloudwatch_attachment" {
   role       = aws_iam_role.backend_role.name
   policy_arn = aws_iam_policy.cloudwatch_logs_policy.arn
@@ -208,6 +241,11 @@ resource "aws_iam_role_policy_attachment" "frontend_ecr_attachment" {
 
 resource "aws_iam_role_policy_attachment" "backend_kms_attachment" {
   role       = aws_iam_role.backend_role.name
+  policy_arn = aws_iam_policy.kms_usage_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "backend_irsa_kms_attachment" {
+  role       = aws_iam_role.backend_irsa_role.name
   policy_arn = aws_iam_policy.kms_usage_policy.arn
 }
 

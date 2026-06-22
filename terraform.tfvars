@@ -24,8 +24,9 @@ frontend_port = 80
 backend_port  = 5000
 database_port = 27017
 
-frontend_image = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-frontend:v1"
-backend_image  = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-backend:v1"
+frontend_image = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-frontend:v4"
+backend_image  = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-backend:v2"
+frontend_url   = "http://m3music-dev.local"
 
 desired_capacity = 1
 min_size         = 1
@@ -35,5 +36,5 @@ songs_bucket_name = "m3-music"
 
 admin_email = "mithelesh.tmz.m3@gmail.com"
 
-upload_lambda_image = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/upload-processor:v5"
+upload_lambda_image = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/upload-processor:v9"
 report_lambda_image = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/report-processor:v1"

@@ -103,34 +103,48 @@ resource "aws_security_group" "database_sg" {
   description = "Security group for MongoDB"
   vpc_id      = aws_vpc.main.id
 
-  ingress {
-    description     = "MongoDB from Backend Instances"
-    from_port       = var.database_port
-    to_port         = var.database_port
-    protocol        = "tcp"
-    security_groups = [aws_security_group.backend_sg.id]
-  }
-
-  ingress {
-    description = "MongoDB from Lambda"
-    from_port   = var.database_port
-    to_port     = var.database_port
-    protocol    = "tcp"
-    security_groups = [
-      aws_security_group.lambda_sg.id
-    ]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name = "${var.project_name}-Database-SG"
   }
+}
+
+resource "aws_security_group_rule" "mongodb_from_backend" {
+  description              = "MongoDB from Backend Instances"
+  type                     = "ingress"
+  from_port                = var.database_port
+  to_port                  = var.database_port
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.database_sg.id
+  source_security_group_id = aws_security_group.backend_sg.id
+}
+
+resource "aws_security_group_rule" "mongodb_from_lambda" {
+  description              = "MongoDB from Lambda"
+  type                     = "ingress"
+  from_port                = var.database_port
+  to_port                  = var.database_port
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.database_sg.id
+  source_security_group_id = aws_security_group.lambda_sg.id
+}
+
+resource "aws_security_group_rule" "mongodb_from_eks_nodes" {
+  description              = "MongoDB from EKS managed nodes"
+  type                     = "ingress"
+  from_port                = var.database_port
+  to_port                  = var.database_port
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.database_sg.id
+  source_security_group_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
+}
+
+resource "aws_security_group_rule" "database_all_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  security_group_id = aws_security_group.database_sg.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group" "lambda_sg" {
