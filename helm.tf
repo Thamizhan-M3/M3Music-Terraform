@@ -1,12 +1,7 @@
-data "aws_eks_cluster" "main" {
-  name = aws_eks_cluster.main.name
-
-  depends_on = [aws_eks_cluster.main]
-}
-
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.main.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.main.certificate_authority[0].data)
+  host                   = aws_eks_cluster.main.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
+
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
@@ -23,8 +18,8 @@ provider "kubernetes" {
 
 provider "helm" {
   kubernetes = {
-    host                   = data.aws_eks_cluster.main.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.main.certificate_authority[0].data)
+    host                   = aws_eks_cluster.main.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
 
     exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
@@ -42,12 +37,29 @@ provider "helm" {
 }
 
 resource "helm_release" "m3music" {
-  count            = fileexists("${path.module}/M3Music-Helm/Chart.yaml") ? 1 : 0
-  name             = "dev-m3"
-  namespace        = "default"
+  name             = "m3music"
+  namespace        = "dev-m3"
   create_namespace = true
+  chart            = "../M3Music-Helm"
 
-  chart = "${path.module}/M3Music-Helm"
+  set = [
+    {
+      name  = "backend.image.repository"
+      value = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-backend"
+    },
+    {
+      name  = "backend.image.tag"
+      value = "v1"
+    },
+    {
+      name  = "frontend.image.repository"
+      value = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-frontend"
+    },
+    {
+      name  = "frontend.image.tag"
+      value = "v1"
+    }
+  ]
 
   depends_on = [
     aws_eks_node_group.main
