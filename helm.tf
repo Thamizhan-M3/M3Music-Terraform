@@ -40,19 +40,19 @@ resource "helm_release" "m3music" {
 
   set = [
     {
-      name  = "backend.image.repository"
+      name  = "backend.backend.image.repository"
       value = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-backend"
     },
     {
-      name  = "backend.image.tag"
+      name  = "backend.backend.image.tag"
       value = "v1"
     },
     {
-      name  = "frontend.image.repository"
+      name  = "frontend.frontend.image.repository"
       value = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-frontend"
     },
     {
-      name  = "frontend.image.tag"
+      name  = "frontend.frontend.image.tag"
       value = "v1"
     }
   ]
