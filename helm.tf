@@ -36,11 +36,19 @@ provider "helm" {
   }
 }
 
+data "aws_eks_cluster" "main" {
+  name = aws_eks_cluster.main.name
+}
+
+data "aws_eks_cluster_auth" "main" {
+  name = aws_eks_cluster.main.name
+}
+
 resource "helm_release" "m3music" {
   name             = "m3music"
   namespace        = "dev-m3"
   create_namespace = true
-  chart            = "../M3Music-Helm"
+  chart = "${path.module}/../M3Music-Helm"
 
   set = [
     {
