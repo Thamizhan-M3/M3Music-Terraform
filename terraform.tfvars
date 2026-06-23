@@ -28,9 +28,9 @@ frontend_image = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-frontend
 backend_image  = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-backend:v2"
 frontend_url   = "http://m3music-dev.local"
 
-desired_capacity = 1
-min_size         = 1
-max_size         = 1
+desired_capacity = 2
+min_size         = 2
+max_size         = 3
 
 songs_bucket_name = "m3-music"
 

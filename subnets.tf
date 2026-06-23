@@ -5,9 +5,9 @@ resource "aws_subnet" "bastionhost_subnet_a" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                              = "${var.project_name}-BastionHost-Subnet-A"
+    Name                                            = "${var.project_name}-BastionHost-Subnet-A"
     "kubernetes.io/cluster/${var.project_name}-eks" = "shared"
-    "kubernetes.io/role/elb"                         = "1"
+    "kubernetes.io/role/elb"                        = "1"
   }
 }
 
@@ -18,9 +18,9 @@ resource "aws_subnet" "bastionhost_subnet_b" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name                              = "${var.project_name}-BastionHost-Subnet-B"
+    Name                                            = "${var.project_name}-BastionHost-Subnet-B"
     "kubernetes.io/cluster/${var.project_name}-eks" = "shared"
-    "kubernetes.io/role/elb"                         = "1"
+    "kubernetes.io/role/elb"                        = "1"
   }
 }
 
@@ -30,9 +30,9 @@ resource "aws_subnet" "frontend_subnet_a" {
   availability_zone = var.availability_zone_a
 
   tags = {
-    Name                              = "${var.project_name}-Frontend-Subnet-A"
+    Name                                            = "${var.project_name}-Frontend-Subnet-A"
     "kubernetes.io/cluster/${var.project_name}-eks" = "shared"
-    "kubernetes.io/role/internal-elb"                = "1"
+    "kubernetes.io/role/internal-elb"               = "1"
   }
 }
 
@@ -42,9 +42,9 @@ resource "aws_subnet" "frontend_subnet_b" {
   availability_zone = var.availability_zone_b
 
   tags = {
-    Name                              = "${var.project_name}-Frontend-Subnet-B"
+    Name                                            = "${var.project_name}-Frontend-Subnet-B"
     "kubernetes.io/cluster/${var.project_name}-eks" = "shared"
-    "kubernetes.io/role/internal-elb"                = "1"
+    "kubernetes.io/role/internal-elb"               = "1"
   }
 }
 
@@ -54,9 +54,9 @@ resource "aws_subnet" "backend_subnet_a" {
   availability_zone = var.availability_zone_a
 
   tags = {
-    Name                              = "${var.project_name}-Backend-Subnet-A"
+    Name                                            = "${var.project_name}-Backend-Subnet-A"
     "kubernetes.io/cluster/${var.project_name}-eks" = "shared"
-    "kubernetes.io/role/internal-elb"                = "1"
+    "kubernetes.io/role/internal-elb"               = "1"
   }
 }
 
@@ -66,9 +66,9 @@ resource "aws_subnet" "backend_subnet_b" {
   availability_zone = var.availability_zone_b
 
   tags = {
-    Name                              = "${var.project_name}-Backend-Subnet-B"
+    Name                                            = "${var.project_name}-Backend-Subnet-B"
     "kubernetes.io/cluster/${var.project_name}-eks" = "shared"
-    "kubernetes.io/role/internal-elb"                = "1"
+    "kubernetes.io/role/internal-elb"               = "1"
   }
 }
 
@@ -78,7 +78,7 @@ resource "aws_subnet" "database_subnet_a" {
   availability_zone = var.availability_zone_a
 
   tags = {
-    Name                              = "${var.project_name}-Database-Subnet-A"
+    Name                                            = "${var.project_name}-Database-Subnet-A"
     "kubernetes.io/cluster/${var.project_name}-eks" = "shared"
   }
 }
@@ -89,7 +89,7 @@ resource "aws_subnet" "database_subnet_b" {
   availability_zone = var.availability_zone_b
 
   tags = {
-    Name                              = "${var.project_name}-Database-Subnet-B"
+    Name                                            = "${var.project_name}-Database-Subnet-B"
     "kubernetes.io/cluster/${var.project_name}-eks" = "shared"
   }
 }

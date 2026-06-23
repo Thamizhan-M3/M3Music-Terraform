@@ -59,7 +59,7 @@ resource "helm_release" "m3music" {
   name             = "m3music"
   namespace        = "dev-m3"
   create_namespace = true
-  chart            = "${path.module}/../M3Music-Helm"
+  chart            = "https://github.com/Thamizhan-M3/M3Music-Helm/releases/download/v0.1.0/m3-music-0.1.0.tgz"
   timeout          = 600
   wait             = true
 

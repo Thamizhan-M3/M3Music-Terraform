@@ -8,7 +8,7 @@ resource "aws_cloudfront_origin_access_control" "songs_oac" {
 
 resource "aws_cloudfront_distribution" "songs_cdn" {
 
-  enabled    = true
+  enabled = true
   # web_acl_id = aws_wafv2_web_acl.songs_cdn.arn
 
   origin {
