@@ -27,6 +27,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.15.6
+          terraform_wrapper: false
 
       - name: Terraform Init
         run: terraform init
@@ -34,5 +35,8 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -no-color
+
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplane
