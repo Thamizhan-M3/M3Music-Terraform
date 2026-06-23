@@ -30,13 +30,10 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -no-color
 
       - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan -no-color
+        run: terraform validate -no-color
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve tfplane
+        run: terraform apply -auto-approve -no-color
