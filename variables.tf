@@ -114,3 +114,9 @@ variable "upload_lambda_image" {
 variable "report_lambda_image" {
   type = string
 }
+
+variable "enable_monitoring" {
+  type        = bool
+  default     = true
+  description = "Install kube-prometheus-stack into the monitoring namespace when true."
+}

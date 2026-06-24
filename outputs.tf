@@ -25,3 +25,59 @@ output "upload_events_table" {
 output "hourly_report_topic_arn" {
   value = aws_sns_topic.hourly_upload_report.arn
 }
+
+output "m3music_namespace" {
+  value = helm_release.m3music.namespace
+}
+
+output "m3music_frontend_service_name" {
+  value = "m3music-m3-music-frontend"
+}
+
+output "m3music_backend_service_name" {
+  value = "m3music-m3-music-backend"
+}
+
+output "m3music_frontend_service_type" {
+  value = "LoadBalancer"
+}
+
+output "tradeflow_namespace" {
+  value = "tradeflow"
+}
+
+output "tradeflow_gateway_service_name" {
+  value = "tradeflow-eks-gateway"
+}
+
+output "tradeflow_endpoint_lookup_command" {
+  value = "kubectl get svc tradeflow-eks-gateway -n tradeflow -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'"
+}
+
+output "argocd_namespace" {
+  value = helm_release.argocd.namespace
+}
+
+output "argocd_server_service_name" {
+  value = "argocd-server"
+}
+
+output "argocd_endpoint_lookup_command" {
+  value = "kubectl get svc argocd-server -n argocd"
+}
+
+output "grafana_namespace" {
+  value = "disabled"
+}
+
+output "grafana_service_name" {
+  value = "disabled"
+}
+
+output "grafana_endpoint_lookup_command" {
+  value = "Grafana is disabled to reduce kube-prometheus-stack pod footprint"
+}
+
+output "prometheus_service_name" {
+  value = "kube-prometheus-stack-prometheus"
+}

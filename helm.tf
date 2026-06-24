@@ -59,9 +59,10 @@ resource "helm_release" "m3music" {
   name             = "m3music"
   namespace        = "dev-m3"
   create_namespace = true
-  chart            = "https://github.com/Thamizhan-M3/M3Music-Helm/releases/download/v0.1.0/m3-music-0.1.0.tgz"
-  timeout          = 600
-  wait             = true
+  # chart            = "https://github.com/Thamizhan-M3/M3Music-Helm/releases/download/v0.1.0/m3-music-0.1.0.tgz"
+  chart   = "../M3Music-Helm"
+  timeout = 600
+  wait    = true
 
   set = [
     {
@@ -73,12 +74,20 @@ resource "helm_release" "m3music" {
       value = local.backend_image_tag
     },
     {
+      name  = "backend.replicaCount"
+      value = "2"
+    },
+    {
       name  = "frontend.image.repository"
       value = local.frontend_image_repository
     },
     {
       name  = "frontend.image.tag"
       value = local.frontend_image_tag
+    },
+    {
+      name  = "frontend.replicaCount"
+      value = "2"
     },
     {
       name  = "frontend.service.type"
@@ -115,6 +124,14 @@ resource "helm_release" "m3music" {
     {
       name  = "env.S3_PUBLIC_URL"
       value = "https://${aws_cloudfront_distribution.songs_cdn.domain_name}"
+    },
+    {
+      name  = "networkPolicy.backend.database.cidr"
+      value = "${aws_instance.database_instance.private_ip}/32"
+    },
+    {
+      name  = "networkPolicy.backend.database.port"
+      value = tostring(var.database_port)
     }
   ]
 
