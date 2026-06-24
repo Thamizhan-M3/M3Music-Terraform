@@ -46,6 +46,6 @@ resource "kubernetes_manifest" "tradeflow_argocd_application" {
   }
 
     depends_on = [
-        module.argocd
+        module.gitops
     ]
 }
