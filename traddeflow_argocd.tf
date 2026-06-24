@@ -45,7 +45,7 @@ resource "kubernetes_manifest" "tradeflow_argocd_application" {
     }
   }
 
-  depends_on = [
-    helm_release.argocd
-  ]
+    depends_on = [
+        module.argocd
+    ]
 }
