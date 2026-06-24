@@ -8,22 +8,30 @@ resource "helm_release" "kube_prometheus_stack" {
   chart      = "kube-prometheus-stack"
   version    = "61.9.0"
 
-  timeout = 600
+  timeout = 1200
   wait    = true
 
   values = [
     yamlencode({
+      admissionWebhooks = {
+        enabled = false
+      }
+
       defaultRules = {
         create = false
       }
+
       alertmanager = {
         enabled = false
       }
+
       "prometheus-node-exporter" = {
         enabled = false
       }
+
       grafana = {
-        enabled = false
+        enabled = true
+
         resources = {
           requests = {
             cpu    = "50m"
@@ -34,15 +42,18 @@ resource "helm_release" "kube_prometheus_stack" {
             memory = "256Mi"
           }
         }
+
         service = {
-          type = "ClusterIP"
+          type = "LoadBalancer"
           port = 80
         }
       }
+
       prometheus = {
         prometheusSpec = {
           replicas  = 1
           retention = "6h"
+
           resources = {
             requests = {
               cpu    = "100m"
@@ -54,14 +65,13 @@ resource "helm_release" "kube_prometheus_stack" {
             }
           }
         }
+
         service = {
           type = "ClusterIP"
         }
       }
+
       prometheusOperator = {
-        admissionWebhooks = {
-          enabled = false
-        }
         resources = {
           requests = {
             cpu    = "50m"
@@ -73,8 +83,10 @@ resource "helm_release" "kube_prometheus_stack" {
           }
         }
       }
+
       "kube-state-metrics" = {
         enabled = false
+
         resources = {
           requests = {
             cpu    = "25m"
@@ -87,9 +99,5 @@ resource "helm_release" "kube_prometheus_stack" {
         }
       }
     })
-  ]
-
-  depends_on = [
-    aws_eks_node_group.main
   ]
 }

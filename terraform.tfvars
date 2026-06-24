@@ -24,8 +24,8 @@ frontend_port = 80
 backend_port  = 5000
 database_port = 27017
 
-frontend_image = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-frontend:v4"
-backend_image  = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-backend:v2"
+frontend_image = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-frontend:v5"
+backend_image  = "115717304992.dkr.ecr.ap-south-1.amazonaws.com/m3music-backend:latest"
 frontend_url   = "http://m3music-dev.local"
 
 desired_capacity = 3

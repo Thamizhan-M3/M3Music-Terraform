@@ -1,6 +1,6 @@
 provider "kubernetes" {
-  host                   = aws_eks_cluster.main.endpoint
-  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority[0].data)
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
 
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
@@ -9,7 +9,7 @@ provider "kubernetes" {
       "eks",
       "get-token",
       "--cluster-name",
-      aws_eks_cluster.main.name,
+      module.eks.cluster_name,
       "--region",
       var.aws_region
     ]
@@ -18,18 +18,21 @@ provider "kubernetes" {
 
 provider "helm" {
   kubernetes = {
-    host                   = data.aws_eks_cluster.main.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.main.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.main.token
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args = [
+        "eks",
+        "get-token",
+        "--cluster-name",
+        module.eks.cluster_name,
+        "--region",
+        var.aws_region
+      ]
+    }
   }
-}
-
-data "aws_eks_cluster" "main" {
-  name = aws_eks_cluster.main.name
-}
-
-data "aws_eks_cluster_auth" "main" {
-  name = aws_eks_cluster.main.name
 }
 
 locals {
@@ -103,7 +106,7 @@ resource "helm_release" "m3music" {
     },
     {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-      value = aws_iam_role.backend_irsa_role.arn
+      value = module.iam.backend_irsa_role_arn
     },
     {
       name  = "env.PORT"
@@ -147,8 +150,7 @@ resource "helm_release" "m3music" {
   ]
 
   depends_on = [
-    aws_eks_node_group.main,
-    aws_iam_role_policy_attachment.backend_irsa_s3_attachment,
-    aws_iam_role_policy_attachment.backend_irsa_kms_attachment
+    module.eks,
+    module.iam
   ]
 }

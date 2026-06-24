@@ -14,6 +14,18 @@ variable "project_name" {
   type = string
 }
 
+variable "environment" {
+  type        = string
+  default     = "dev"
+  description = "Deployment environment tag applied to taggable AWS resources."
+}
+
+variable "owner" {
+  type        = string
+  default     = "M3Music"
+  description = "Owner tag applied to taggable AWS resources."
+}
+
 variable "vpc_cidr" {
   type = string
 }

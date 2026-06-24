@@ -53,4 +53,8 @@ resource "aws_cloudfront_distribution" "songs_cdn" {
   viewer_certificate {
     cloudfront_default_certificate = true
   }
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-songs-cdn"
+  })
 }

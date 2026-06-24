@@ -2,16 +2,16 @@ resource "aws_lambda_function" "upload_logger" {
   function_name = "${var.project_name}-upload-logger"
   package_type  = "Image"
   image_uri     = var.upload_lambda_image
-  role          = aws_iam_role.upload_logger_lambda_role.arn
+  role          = module.iam.upload_logger_lambda_role_arn
   timeout       = 60
   memory_size   = 512
 
   vpc_config {
     subnet_ids = [
-      aws_subnet.backend_subnet_a.id,
-      aws_subnet.backend_subnet_b.id
+      module.vpc.backend_subnet_ids[0],
+      module.vpc.backend_subnet_ids[1]
     ]
-    security_group_ids = [aws_security_group.lambda_sg.id]
+    security_group_ids = [module.vpc.lambda_sg_id]
   }
 
   environment {
@@ -20,16 +20,20 @@ resource "aws_lambda_function" "upload_logger" {
       DATABASE_IP       = aws_instance.database_instance.private_ip
       DATABASE_PORT     = var.database_port
       MONGO_DB_NAME     = "m3-music"
-      DYNAMODB_TABLE    = aws_dynamodb_table.upload_events.name
+      DYNAMODB_TABLE    = module.database.upload_events_name
       BEDROCK_MODEL     = "amazon.nova-2-lite-v1:0"
     }
   }
 
-  depends_on = [aws_nat_gateway.nat_gateway]
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-upload-logger"
+  })
+
+  depends_on = [module.vpc]
 }
 
 resource "aws_lambda_event_source_mapping" "upload_events_mapping" {
-  event_source_arn                   = aws_sqs_queue.upload_events_queue.arn
+  event_source_arn                   = module.messaging.upload_events_queue_arn
   function_name                      = aws_lambda_function.upload_logger.arn
   batch_size                         = 10
   maximum_batching_window_in_seconds = 10
@@ -40,48 +44,52 @@ resource "aws_lambda_function" "hourly_report" {
   function_name = "${var.project_name}-hourly-report"
   package_type  = "Image"
   image_uri     = var.report_lambda_image
-  role          = aws_iam_role.report_lambda_role.arn
+  role          = module.iam.report_lambda_role_arn
   timeout       = 300
   memory_size   = 512
 
   vpc_config {
     subnet_ids = [
-      aws_subnet.backend_subnet_a.id,
-      aws_subnet.backend_subnet_b.id
+      module.vpc.backend_subnet_ids[0],
+      module.vpc.backend_subnet_ids[1]
     ]
-    security_group_ids = [aws_security_group.lambda_sg.id]
+    security_group_ids = [module.vpc.lambda_sg_id]
   }
 
   environment {
     variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.upload_events.name
-      SNS_TOPIC_ARN  = aws_sns_topic.hourly_upload_report.arn
+      DYNAMODB_TABLE = module.database.upload_events_name
+      SNS_TOPIC_ARN  = module.messaging.hourly_upload_report_topic_arn
       DATABASE_IP    = aws_instance.database_instance.private_ip
     }
   }
 
-  depends_on = [aws_nat_gateway.nat_gateway]
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-hourly-report"
+  })
+
+  depends_on = [module.vpc]
 }
 
 resource "aws_lambda_function" "query_songs" {
   function_name = "${var.project_name}-query-songs"
   package_type  = "Image"
   image_uri     = var.upload_lambda_image
-  role          = aws_iam_role.query_songs_lambda_role.arn
+  role          = module.iam.query_songs_lambda_role_arn
   timeout       = 60
   memory_size   = 512
 
   vpc_config {
     subnet_ids = [
-      aws_subnet.backend_subnet_a.id,
-      aws_subnet.backend_subnet_b.id
+      module.vpc.backend_subnet_ids[0],
+      module.vpc.backend_subnet_ids[1]
     ]
-    security_group_ids = [aws_security_group.lambda_sg.id]
+    security_group_ids = [module.vpc.lambda_sg_id]
   }
 
   environment {
     variables = {
-      DYNAMODB_TABLE       = aws_dynamodb_table.upload_events.name
+      DYNAMODB_TABLE       = module.database.upload_events_name
       MOOD_INDEX_NAME      = "mood-uploadedAt-index"
       GENRE_INDEX_NAME     = "genre-uploadedAt-index"
       UPLOADED_INDEX_NAME  = "uploadedAt-index"
@@ -89,5 +97,9 @@ resource "aws_lambda_function" "query_songs" {
     }
   }
 
-  depends_on = [aws_nat_gateway.nat_gateway]
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-query-songs"
+  })
+
+  depends_on = [module.vpc]
 }

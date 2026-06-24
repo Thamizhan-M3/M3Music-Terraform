@@ -3,15 +3,15 @@ output "cloudfront_domain" {
 }
 
 output "eks_cluster_name" {
-  value = aws_eks_cluster.main.name
+  value = module.eks.cluster_name
 }
 
 output "eks_cluster_endpoint" {
-  value = aws_eks_cluster.main.endpoint
+  value = module.eks.cluster_endpoint
 }
 
 output "eks_node_group_name" {
-  value = aws_eks_node_group.main.node_group_name
+  value = module.eks.node_group_name
 }
 
 output "database_private_ip" {
@@ -19,11 +19,11 @@ output "database_private_ip" {
 }
 
 output "upload_events_table" {
-  value = aws_dynamodb_table.upload_events.name
+  value = module.database.upload_events_name
 }
 
 output "hourly_report_topic_arn" {
-  value = aws_sns_topic.hourly_upload_report.arn
+  value = module.messaging.hourly_upload_report_topic_arn
 }
 
 output "m3music_namespace" {
@@ -55,7 +55,7 @@ output "tradeflow_endpoint_lookup_command" {
 }
 
 output "argocd_namespace" {
-  value = helm_release.argocd.namespace
+  value = module.gitops.argocd_namespace
 }
 
 output "argocd_server_service_name" {
@@ -67,17 +67,25 @@ output "argocd_endpoint_lookup_command" {
 }
 
 output "grafana_namespace" {
-  value = "disabled"
+  value = module.monitoring.monitoring_namespace
 }
 
 output "grafana_service_name" {
-  value = "disabled"
+  value = module.monitoring.grafana_service_name
 }
 
 output "grafana_endpoint_lookup_command" {
-  value = "Grafana is disabled to reduce kube-prometheus-stack pod footprint"
+  value = "kubectl get svc kube-prometheus-stack-grafana -n monitoring"
 }
 
 output "prometheus_service_name" {
-  value = "kube-prometheus-stack-prometheus"
+  value = module.monitoring.prometheus_service_name
+}
+
+output "backend_ecr_repository_url" {
+  value = module.storage.backend_ecr_repository_url
+}
+
+output "frontend_ecr_repository_url" {
+  value = module.storage.frontend_ecr_repository_url
 }

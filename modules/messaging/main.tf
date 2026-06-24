@@ -2,9 +2,9 @@ resource "aws_sqs_queue" "upload_events_dlq" {
   name                      = "${var.project_name}-upload-events-dlq"
   message_retention_seconds = 1209600
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.project_name}-upload-events-dlq"
-  }
+  })
 }
 
 resource "aws_sqs_queue" "upload_events_queue" {
@@ -17,9 +17,9 @@ resource "aws_sqs_queue" "upload_events_queue" {
     maxReceiveCount     = 5
   })
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name = "${var.project_name}-upload-events"
-  }
+  })
 }
 
 resource "aws_sqs_queue_policy" "upload_events_from_s3" {
@@ -38,13 +38,35 @@ resource "aws_sqs_queue_policy" "upload_events_from_s3" {
         Resource = aws_sqs_queue.upload_events_queue.arn
         Condition = {
           ArnEquals = {
-            "aws:SourceArn" = aws_s3_bucket.songs_bucket.arn
+            "aws:SourceArn" = var.songs_bucket_arn
           }
           StringEquals = {
-            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "aws:SourceAccount" = var.caller_account_id
           }
         }
       }
     ]
+  })
+}
+
+resource "aws_sns_topic" "hourly_upload_report" {
+  name = "${var.project_name}-hourly-upload-report"
+
+  tags = merge(var.common_tags, {
+    Name = "${var.project_name}-hourly-upload-report"
+  })
+}
+
+resource "aws_sns_topic_subscription" "admin_email" {
+  topic_arn = aws_sns_topic.hourly_upload_report.arn
+  protocol  = "email"
+  endpoint  = var.admin_email
+}
+
+resource "aws_sns_topic" "upload_reports" {
+  name = "${var.project_name}-upload-reports"
+
+  tags = merge(var.common_tags, {
+    Name = "${var.project_name}-upload-reports"
   })
 }

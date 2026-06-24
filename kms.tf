@@ -2,6 +2,10 @@ resource "aws_kms_key" "songs_kms" {
   description             = "KMS key for songs bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+
+  tags = merge(local.common_tags, {
+    Name = "${var.project_name}-songs-key"
+  })
 }
 
 resource "aws_kms_alias" "songs_kms_alias" {
@@ -30,7 +34,7 @@ resource "aws_kms_key_policy" "songs_kms_policy" {
         Sid    = "AllowBackendRoleUsage",
         Effect = "Allow",
         Principal = {
-          AWS = aws_iam_role.backend_role.arn
+          AWS = module.iam.backend_role_arn
         },
         Action = [
           "kms:GenerateDataKey",

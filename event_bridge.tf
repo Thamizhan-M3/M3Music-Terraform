@@ -10,11 +10,11 @@ resource "aws_s3_bucket_notification" "songs_upload_notification" {
   bucket = aws_s3_bucket.songs_bucket.id
 
   queue {
-    queue_arn = aws_sqs_queue.upload_events_queue.arn
+    queue_arn = module.messaging.upload_events_queue_arn
     events    = ["s3:ObjectCreated:*"]
   }
 
-  depends_on = [aws_sqs_queue_policy.upload_events_from_s3]
+  depends_on = [module.messaging]
 }
 
 resource "aws_lambda_permission" "allow_bedrock_query" {

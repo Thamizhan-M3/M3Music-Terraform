@@ -3,9 +3,9 @@ resource "aws_s3_bucket" "songs_bucket" {
 
   force_destroy = true
 
-  tags = {
+  tags = merge(local.common_tags, {
     Name = "${var.project_name}-songs"
-  }
+  })
 }
 
 resource "aws_s3_bucket_versioning" "songs_versioning" {

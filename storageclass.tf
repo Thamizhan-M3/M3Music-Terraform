@@ -14,6 +14,6 @@ resource "kubernetes_storage_class" "gp3" {
   }
 
   depends_on = [
-    aws_eks_addon.ebs_csi
+    module.eks
   ]
 }

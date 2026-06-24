@@ -1,8 +1,9 @@
 resource "aws_bedrockagent_agent" "music_agent" {
   agent_name                  = "${var.project_name}-music-agent"
   foundation_model            = "amazon.nova-2-lite-v1:0"
-  agent_resource_role_arn     = aws_iam_role.bedrock_agent_role.arn
+  agent_resource_role_arn     = module.iam.bedrock_agent_role_arn
   idle_session_ttl_in_seconds = 600
+  tags                        = local.common_tags
 
   instruction = <<EOF
     You are the playlist generation agent for m3-music.

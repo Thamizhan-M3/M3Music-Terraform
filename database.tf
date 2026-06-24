@@ -1,13 +1,13 @@
 resource "aws_instance" "database_instance" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
-  subnet_id              = aws_subnet.database_subnet_a.id
-  vpc_security_group_ids = [aws_security_group.database_sg.id]
+  subnet_id              = module.vpc.database_subnet_ids[0]
+  vpc_security_group_ids = [module.vpc.database_sg_id]
   key_name               = var.key_name
-  iam_instance_profile   = aws_iam_instance_profile.database_profile.name
+  iam_instance_profile   = module.iam.database_profile_name
 
   depends_on = [
-    aws_nat_gateway.nat_gateway
+    module.vpc
   ]
 
   user_data = <<-EOF
@@ -43,18 +43,18 @@ resource "aws_instance" "database_instance" {
                     mongo
                 EOF
 
-  tags = {
+  tags = merge(local.common_tags, {
     Name = "${var.project_name}-Database-Instance"
-  }
+  })
 }
 
 resource "aws_instance" "mongodb_replica" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
-  subnet_id              = aws_subnet.database_subnet_b.id
-  vpc_security_group_ids = [aws_security_group.database_sg.id]
+  subnet_id              = module.vpc.database_subnet_ids[1]
+  vpc_security_group_ids = [module.vpc.database_sg_id]
   key_name               = var.key_name
-  iam_instance_profile   = aws_iam_instance_profile.database_profile.name
+  iam_instance_profile   = module.iam.database_profile_name
 
   depends_on = [
     aws_instance.database_instance
@@ -108,59 +108,8 @@ resource "aws_instance" "mongodb_replica" {
                     "
                     EOF
 
-  tags = {
+  tags = merge(local.common_tags, {
     Name = "${var.project_name}-Mongo-Replica"
-  }
+  })
 }
 
-resource "aws_dynamodb_table" "upload_events" {
-  name         = "${var.project_name}-upload-events"
-  billing_mode = "PAY_PER_REQUEST"
-
-  hash_key  = "songId"
-  range_key = "uploadedAt"
-
-  attribute {
-    name = "songId"
-    type = "S"
-  }
-
-  attribute {
-    name = "uploadedAt"
-    type = "S"
-  }
-
-  attribute {
-    name = "mood"
-    type = "S"
-  }
-
-  attribute {
-    name = "genre"
-    type = "S"
-  }
-
-  global_secondary_index {
-    name            = "mood-uploadedAt-index"
-    hash_key        = "mood"
-    range_key       = "uploadedAt"
-    projection_type = "ALL"
-  }
-
-  global_secondary_index {
-    name            = "genre-uploadedAt-index"
-    hash_key        = "genre"
-    range_key       = "uploadedAt"
-    projection_type = "ALL"
-  }
-
-  global_secondary_index {
-    name            = "uploadedAt-index"
-    hash_key        = "uploadedAt"
-    projection_type = "ALL"
-  }
-
-  tags = {
-    Name = "${var.project_name}-upload-events"
-  }
-}
